@@ -113,3 +113,153 @@ answer=response.choices[0].message.content
 
 raw_json=answer
 # print(raw_json)
+
+
+# now from here onwards we create and define a schema of a actual Resume
+
+import json
+job_data=json.loads(raw_json)
+
+job = JobD(**job_data)
+
+# job me jo humne resume requirements ka jo schema banaya tha vo daal diya
+
+print(job.minimum_experience)
+print(job.education_requirements)
+
+
+
+#parse real
+class MatchResult(BaseModel):
+    score: float
+    details: dict
+# jo hum score calculate krenge uska class hai hai
+ 
+ 
+class Experience(BaseModel):
+    company: str | None = None
+    role: str | None = None
+    duration: str | None = None
+    description: str | None = None
+    skills_used: list[str] = []
+
+# ye humare resume me jo bhi experences hoga uska class hai ..... experenxes ka class alag se kyu bcz experences me bhi bhut saare stages hote hai .... role , company , etc
+
+
+class Resume(BaseModel):
+    name: str | None = None  
+    email: str | None = None
+    phone: str | None = None
+
+    total_experience_years: float | None = None
+
+    skills: list[str] = []
+    experiences: list[Experience] = []
+    education: list[str] = []
+    projects: list[str] = []
+    certifications: list[str] = []
+# ye humara resume ki class hai  none means that this section may be optional ... isi schema me humne experences ko bhi addd kr diya hai to uska alag se schema banan eka koi jarurat nhi hai
+
+
+resume_schema = Resume.model_json_schema()
+# resume schema
+
+
+def final_score(job,resume):
+    match_schema = MatchResult.model_json_schema()
+    prompt = f"""
+    You are an HR recruiter.
+
+    Compare the candidate's resume with the job description.
+
+    JOB DESCRIPTION:
+    {job.model_dump_json(indent=2)}
+
+    CANDIDATE RESUME:
+    {resume.model_dump_json(indent=2)}
+    Return JSON matching this schema:
+
+    {match_schema}
+
+    Give me:
+
+    1. Candidate name
+    2. Matching skills
+    3. Missing important skills
+    4. Whether experience requirement is met
+    5. Overall match percentage from 0 to 100
+    6. A short final verdict
+
+    Keep the response concise and easy to read.
+    """
+
+
+# yaha humne ek function banya hai jiske ander humne humare job description waale / job requirement waale schema ko passs kiya hai ..... aur ek actual resume ke schema ko pass kiya hai .... ye function dono schema ko match krega aur hume name , matching skills , kitna score kiya ye sb hume return krke dega
+
+
+    message={
+        "role": "user",
+        "content" : prompt
+    }
+    messages=[message]
+    response_format={
+        "type": "json_object"
+    }
+    response = client.chat.completions.create(model=model, messages=messages, response_format=response_format)
+    data = json.loads(response.choices[0].message.content)
+    return MatchResult(**data)
+def parse_resume(resume_text):
+    system_prompt = f"""
+    You are an expert resume parser.
+
+    Extract information from the resume based on its meaning,
+    not only based on exact section headings.
+
+    Different resumes may use different headings.
+
+    For example:
+    - Experience
+    - Professional Experience
+    - Work History
+    - Employment
+    - Internships
+
+    These may all contain relevant experience.
+
+    Skills may also appear in the skills section, work experience,
+    internships or projects.
+
+    Return ONLY valid JSON matching this schema:
+
+    {resume_schema}
+
+    Important rules:
+
+    1. Do not invent information.
+    2. If a value is not available, return null.
+    3. If a list has no information, return an empty list.
+    4. Include internships inside experiences.
+    5. Extract skills mentioned across the entire resume.
+    """
+    user_prompt = f"""
+    Parse the following resume:
+
+    {resume_text}
+    """
+    message_system={
+        "role" : "system",
+        "content" : system_prompt
+    }
+    message_user={
+        "role" : "user",
+        "content" : user_prompt
+    }
+    messages=[message_system, message_user]
+    response_format={
+        "type": "json_object"
+    }
+    response=client.chat.completions.create(model=model, messages=messages, response_format=response_format)
+    raw_output = response.choices[0].message.content
+    data = json.loads(raw_output)
+    resume = Resume(**data)
+    return resume
