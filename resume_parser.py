@@ -207,7 +207,9 @@ def final_score(job,resume):
     }
     response = client.chat.completions.create(model=model, messages=messages, response_format=response_format)
     data = json.loads(response.choices[0].message.content)
+    # humne apne response ko data me store kr liya jo bhi humara score vgera aayega
     return MatchResult(**data)
+# humne match result me apne response ko daal ke usko return kr liya 
 def parse_resume(resume_text):
     system_prompt = f"""
     You are an expert resume parser.
@@ -241,6 +243,8 @@ def parse_resume(resume_text):
     4. Include internships inside experiences.
     5. Extract skills mentioned across the entire resume.
     """
+#  yaha humne fir ek function banya hai ki aur usko parse kiya hai
+
     user_prompt = f"""
     Parse the following resume:
 
@@ -263,3 +267,4 @@ def parse_resume(resume_text):
     data = json.loads(raw_output)
     resume = Resume(**data)
     return resume
+# fir humne sara output resume me daal ke resturn kr liya jisse hum read kr ske data ko not simply printing 
