@@ -280,7 +280,7 @@ def read_pdf(file_path):
             text += page_text + "\n"
     return text
 
-
+# ye function us resume ko read krne ke liye hai jiska formate pdf type ka ho
 def read_docx(file_path):
     document = Document(file_path)
     text = ""
@@ -295,6 +295,8 @@ def read_docx(file_path):
                     text += cell.text + "\n"
     return text
 
+# ye function us resume ko read krne ke liye hai jiska type docs hai
+
 
 def read_resume(file_path):
     if file_path.suffix.lower() == ".pdf":
@@ -303,6 +305,7 @@ def read_resume(file_path):
         return read_docx(file_path)
     else:
         return None
+# ye function bs ye bta rha hai ki agar agar file type pdf hai to pdf wali file ko return krna hai agar docs hai to docs waali file ko return krna hai
 
 
 
@@ -310,7 +313,7 @@ def read_resume(file_path):
 resume_folder = Path("resumes")
 all_results=[]
 for file_path in resume_folder.iterdir():
-    #C:\Users\Pratyush\padho_with_pratyush\week1\day5\resumes\abhay resume new - Abhay Singh.pdf
+    
     if file_path.suffix.lower() not in [".pdf", ".docx"]:
         continue
     print("\nProcessing:", file_path.name)
