@@ -268,3 +268,94 @@ def parse_resume(resume_text):
     resume = Resume(**data)
     return resume
 # fir humne sara output resume me daal ke resturn kr liya jisse hum read kr ske data ko not simply printing 
+
+from pypdf import PdfReader
+from docx import Document
+def read_pdf(file_path):
+    reader = PdfReader(file_path)
+    text = ""
+    for page in reader.pages:
+        page_text = page.extract_text()
+        if page_text:
+            text += page_text + "\n"
+    return text
+
+
+def read_docx(file_path):
+    document = Document(file_path)
+    text = ""
+    for paragraph in document.paragraphs:
+        if paragraph.text.strip():
+            text += paragraph.text + "\n"
+    
+    for table in document.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                if cell.text.strip():
+                    text += cell.text + "\n"
+    return text
+
+
+def read_resume(file_path):
+    if file_path.suffix.lower() == ".pdf":
+        return read_pdf(file_path)
+    elif file_path.suffix.lower() == ".docx":
+        return read_docx(file_path)
+    else:
+        return None
+
+
+
+# lets do it now
+resume_folder = Path("resumes")
+all_results=[]
+for file_path in resume_folder.iterdir():
+    #C:\Users\Pratyush\padho_with_pratyush\week1\day5\resumes\abhay resume new - Abhay Singh.pdf
+    if file_path.suffix.lower() not in [".pdf", ".docx"]:
+        continue
+    print("\nProcessing:", file_path.name)
+    resume_text = read_resume(file_path)
+    parsed_resume=parse_resume(resume_text) # llm call1
+    time.sleep(5)
+    result = final_score(job, parsed_resume) #llm caLL2
+    #score and details
+    #acount chtgpt
+    # request bhejna shhur krega millions
+    #chattgot server jam ho jayega
+    time.sleep(5)
+    print("Score:", result.score)
+    all_results.append({
+        "name": parsed_resume.name,
+        "score": result.score,
+        "details": result.details
+    })
+all_results.sort(
+    key=lambda candidate: candidate["score"],
+    reverse=True
+)
+top_2 = all_results[:2]
+worst_2 = all_results[-2:]
+
+
+print("TOP 2 CANDIDATES")
+for candidate in top_2:
+
+    print(
+        candidate["name"],
+        "-",
+        candidate["score"],
+        "%"
+    )
+
+    print(candidate["details"])
+
+print("LOWEST 2 CANDIDATES")
+for candidate in worst_2:
+
+    print(
+        candidate["name"],
+        "-",
+        candidate["score"],
+        "%"
+    )
+    print(candidate["details"])
