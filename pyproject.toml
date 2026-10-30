@@ -7,7 +7,11 @@ authors = [
     { name = "Krislay Kumar Prajapati", email = "krislaykumarprajapati@gmail.com" }
 ]
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "groq>=1.7.0",
+    "pydantic>=2.14.2",
+    "python-dotenv>=1.2.4",
+]
 
 [project.scripts]
 day5 = "day5:main"
