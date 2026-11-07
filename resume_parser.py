@@ -105,7 +105,12 @@ response_format={
 
 messages=[message_system, message_user]
 
-response=client.chat.completions.create(model=model, messages=messages, response_format=response_format)
+response=client.chat.completions.create(
+    model=model,
+    messages=messages,
+    response_format=response_format,
+    max_completion_tokens=8192,
+)
 
 
 answer=response.choices[0].message.content
@@ -205,7 +210,12 @@ def final_score(job,resume):
     response_format={
         "type": "json_object"
     }
-    response = client.chat.completions.create(model=model, messages=messages, response_format=response_format)
+    response = client.chat.completions.create(
+        model=model,
+        messages=messages,
+        response_format=response_format,
+        max_completion_tokens=8192,
+    )
     data = json.loads(response.choices[0].message.content)
     # humne apne response ko data me store kr liya jo bhi humara score vgera aayega
     return MatchResult(**data)
@@ -262,7 +272,12 @@ def parse_resume(resume_text):
     response_format={
         "type": "json_object"
     }
-    response=client.chat.completions.create(model=model, messages=messages, response_format=response_format)
+    response=client.chat.completions.create(
+        model=model,
+        messages=messages,
+        response_format=response_format,
+        max_completion_tokens=8192,
+    )
     raw_output = response.choices[0].message.content
     data = json.loads(raw_output)
     resume = Resume(**data)
