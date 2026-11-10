@@ -199,7 +199,7 @@ def final_score(job,resume):
     """
 
 
-# yaha humne ek function banya hai jiske ander humne humare job description waale / job requirement waale schema ko passs kiya hai ..... aur ek actual resume ke schema ko pass kiya hai .... ye function dono schema ko match krega aur hume name , matching skills , kitna score kiya ye sb hume return krke dega
+# yaha humne ek function banya hai jiske ander humne humare job description....... waale / job requirement waale schema ko passs kiya hai ..... aur ek actual resume ke schema ko pass kiya hai .... ye function dono schema ko match krega aur hume name , matching skills , kitna score kiya ye sb hume return krke dega
 
 
     message={
